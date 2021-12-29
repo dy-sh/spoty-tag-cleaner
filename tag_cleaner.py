@@ -1,22 +1,5 @@
-from spoty.commands.first_list_commands import \
-    count_command, \
-    delete_command, \
-    export_command, \
-    import_deezer_command, \
-    import_spotify_command, \
-    print_command, \
-    find_duplicates_command
-from spoty.commands import \
-    filter_group, \
-    get_second_group
-from spoty.commands import get_group
 from spoty.utils import SpotyContext
 import spoty.audio_files
-import spoty.spotify_api
-import spoty.deezer_api
-import spoty.audio_files
-import spoty.csv_playlist
-import spoty.utils
 import click
 
 
