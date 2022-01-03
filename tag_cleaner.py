@@ -80,6 +80,27 @@ Clean tags in audio files found in specified path.
                 spoty.audio_files.write_audio_file_tags(file_name, new_tags)
                 tags['ARTIST'] = new_tags['ARTIST']
 
+    # clean ISRC
+
+    replace_list = []
+    for tags in all_tags_list:
+        if 'ISRC' in tags and tags['ISRC'] != fix_isrc(tags['ISRC']):
+            replace_list.append(tags)
+    if len(replace_list) > 0:
+        click.echo()
+        click.echo('--------------------------------------------------------------')
+        for tags in replace_list:
+            file_name = tags['SPOTY_FILE_NAME']
+            click.echo(f'ISRC: "{tags["ISRC"]}" will become: "{fix_isrc(tags["ISRC"])}" in "{file_name}"')
+        if (click.confirm(            f'Do you want to fix ISRC tag in {len(replace_list)} audio files?')):
+            for tags in replace_list:
+                file_name = tags['SPOTY_FILE_NAME']
+                new_tags = {}
+                new_tags['ISRC'] = fix_isrc(tags['ISRC'])
+                spoty.audio_files.write_audio_file_tags(file_name, new_tags)
+                tags['ISRC'] = fix_isrc(tags['ISRC'])
+
+
     # missing DEEZER_TRACK_ID but SOURCEID exist
 
     replace_list = []
@@ -129,3 +150,8 @@ Clean tags in audio files found in specified path.
             click.echo(f'"{file_name}"')
         click.confirm(
             f'This {len(replace_list)} audio files have no SOURCE tag. Fix it manually.')
+
+
+
+def fix_isrc(isrc):
+    return isrc.upper().replace('-','')
