@@ -80,6 +80,38 @@ Clean tags in audio files found in specified path.
                 spoty.audio_files.write_audio_file_tags(file_name, new_tags)
                 tags['ARTIST'] = new_tags['ARTIST']
 
+    # clean too large tags
+
+    replace_list = []
+    replace_list_key = []
+    for tags in all_tags_list:
+        for key, value in tags.items():
+            if len(value) > 131072: # max length for csv files field
+                replace_list.append(tags)
+                replace_list_key.append(key)
+    if len(replace_list) > 0:
+        click.echo()
+        click.echo('--------------------------------------------------------------')
+        for i, tags in enumerate(replace_list):
+            file_name = tags['SPOTY_FILE_NAME']
+            click.echo(f'{replace_list_key[i]} length: {len(tags[replace_list_key[i]])} in file {file_name}')
+        if (click.confirm(f'{len(replace_list)} files have too large tags. Do you want to truncate it?')):
+            for i, tags in enumerate(replace_list):
+                key = replace_list_key[i]
+                file_name = tags['SPOTY_FILE_NAME']
+                new_tags = {}
+                new_tags[key] = tags[key][0: 131071]
+                spoty.audio_files.write_audio_file_tags(file_name, new_tags)
+                tags[key] = tags[key][0: 131071]
+
+    for i, tags in enumerate(tags_list):
+        for key, value in tags.items():
+            if len(value) > 131072:
+                mess = f'Tag "{key}" has value larger than csv field limit (131072) and will be truncated (file: "{csv_file_name}", line: {i + 1}).'
+                click.echo('\n' + mess)
+                log.warning(mess)
+                tags[key] = value[0: 131071]
+
     # clean ISRC
 
     replace_list = []
@@ -92,14 +124,13 @@ Clean tags in audio files found in specified path.
         for tags in replace_list:
             file_name = tags['SPOTY_FILE_NAME']
             click.echo(f'ISRC: "{tags["ISRC"]}" will become: "{fix_isrc(tags["ISRC"])}" in "{file_name}"')
-        if (click.confirm(            f'Do you want to fix ISRC tag in {len(replace_list)} audio files?')):
+        if (click.confirm(f'Do you want to fix ISRC tag in {len(replace_list)} audio files?')):
             for tags in replace_list:
                 file_name = tags['SPOTY_FILE_NAME']
                 new_tags = {}
                 new_tags['ISRC'] = fix_isrc(tags['ISRC'])
                 spoty.audio_files.write_audio_file_tags(file_name, new_tags)
                 tags['ISRC'] = fix_isrc(tags['ISRC'])
-
 
     # missing DEEZER_TRACK_ID but SOURCEID exist
 
@@ -152,6 +183,5 @@ Clean tags in audio files found in specified path.
             f'This {len(replace_list)} audio files have no SOURCE tag. Fix it manually.')
 
 
-
 def fix_isrc(isrc):
-    return isrc.upper().replace('-','')
+    return isrc.upper().replace('-', '')
