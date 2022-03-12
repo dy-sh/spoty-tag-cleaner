@@ -165,7 +165,7 @@ Clean tags in audio files found in specified path.
             file_name = tags['SPOTY_FILE_NAME']
             click.echo(f'"{file_name}"')
         click.confirm(
-            f'This {len(replace_list)} audio files have SOURCE=="DEEZER" but have no SOURCEID and DEEZER_TRACK_ID. You can fix using "spoty get --d me get --a [LOCAL_PATH] duplicates add-missing-tags" command.')
+            f'This {len(replace_list)} audio files have SOURCE=="DEEZER" but have no SOURCEID and DEEZER_TRACK_ID. You can fix using "spoty get --d me get --a [LOCAL_PATH] dup add-missing-tags" command.')
 
     # missing SOURCE
 
